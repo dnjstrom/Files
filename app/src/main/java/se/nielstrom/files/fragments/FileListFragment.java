@@ -74,6 +74,10 @@ public class FileListFragment extends Fragment {
             }
         });
 
+        if (list.getAdapter().getCount() == 0) {
+            rootView.findViewById(R.id.empty_list).setVisibility(View.VISIBLE);
+        }
+
         return rootView;
     }
 

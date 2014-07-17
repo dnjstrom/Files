@@ -32,6 +32,17 @@ public class FilesPagerAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
+    public String getPath() {
+        return path;
+    }
+
+    public String[] getDirectories() {
+        String[] dirs = new String[directories.length + 1];
+        dirs[0] = "/";
+        System.arraycopy(directories, 0, dirs, 1, directories.length);
+        return dirs;
+    }
+
     public int getItemPosition(Object object) {
         //TODO: check which fragments can be kept
         return POSITION_NONE;

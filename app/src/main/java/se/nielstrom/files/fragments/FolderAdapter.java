@@ -1,6 +1,7 @@
 package se.nielstrom.files.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 import se.nielstrom.files.R;
 
@@ -19,8 +25,27 @@ public class FolderAdapter extends ArrayAdapter<File> {
 
     public FolderAdapter(Context context, File file) {
         super(context, ROW_LAYOUT_ID);
-        if (file.isDirectory()) {
-            addAll(file.listFiles()); // TODO: handle non-permited paths gracefully
+        if (file.exists() && file.canRead() && file.isDirectory()) {
+
+            File[] folders = file.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isDirectory();
+                }
+            });
+
+            Arrays.sort(folders, new FileNameComparator());
+            addAll(folders);
+
+            File[] files = file.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isFile();
+                }
+            });
+
+            Arrays.sort(files, new FileNameComparator());
+            addAll(files);
         }
     }
 
@@ -48,12 +73,25 @@ public class FolderAdapter extends ArrayAdapter<File> {
 
         holder.right_arrow.setVisibility( file.isDirectory() ? View.VISIBLE : View.GONE );
 
+        if (!file.canRead()) {
+            holder.titleBox.setTextColor(getContext().getResources().getColor(R.color.non_writeable));
+        } else {
+            holder.titleBox.setTextColor(getContext().getResources().getColor(R.color.text));
+        }
+
         return convertView;
     }
 
     static class ViewHolder {
         TextView titleBox;
         ImageView right_arrow;
+    }
+
+    private class FileNameComparator implements Comparator<File> {
+        @Override
+        public int compare(File file, File file2) {
+            return file.getName().compareTo(file2.getName());
+        }
     }
 }
 
