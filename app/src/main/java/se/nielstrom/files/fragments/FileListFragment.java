@@ -35,8 +35,11 @@ public class FileListFragment extends Fragment {
 
     private OnItemClickListener listener;
 
+    private boolean selectionInProgress = false;
+
     private File currentFile;
     private ListView list;
+    private View rootView;
 
     public FileListFragment() {}
 
@@ -51,7 +54,7 @@ public class FileListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_file_list, container, false);
+        rootView = inflater.inflate(R.layout.fragment_file_list, container, false);
         setHasOptionsMenu(true);
 
         Bundle args = getArguments();
@@ -68,9 +71,28 @@ public class FileListFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectionInProgress = false;
                 if (listener != null) {
-                    listener.onClick(i, view, (File) adapterView.getAdapter().getItem(i));
+                    listener.onClick(i, list, view, (File) adapterView.getAdapter().getItem(i));
                 }
+            }
+        });
+
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (!selectionInProgress) {
+                    selectionInProgress = true;
+                    list.clearChoices();
+                }
+
+                list.setItemChecked(i, true);
+
+                if (listener != null) {
+                    return listener.onLongClick(i, list, view, (File) adapterView.getAdapter().getItem(i));
+                }
+
+                return false;
             }
         });
 
@@ -91,6 +113,8 @@ public class FileListFragment extends Fragment {
     }
 
     public interface OnItemClickListener {
-        public void onClick(int position, View row, File file);
+        public void onClick(int position, ListView list, View row, File file);
+
+        public boolean onLongClick(int position, ListView list, View row, File file);
     }
 }

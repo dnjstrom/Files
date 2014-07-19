@@ -3,4 +3,5 @@
     <color name="non_readable">#FF4444</color>
     <color name="non_writeable">#FFBB33</color>
     <color name="text">#FFFFFF</color>
+    <color name="row_selected">#0099CC</color>
 </resources>

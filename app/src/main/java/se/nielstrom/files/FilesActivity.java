@@ -28,6 +28,8 @@ import se.nielstrom.files.fragments.FileListFragment;
 
 public class FilesActivity extends FragmentActivity  {
 
+    public static final String DEFAULT_PATH = "/sdcard";
+    private static final int MAX_SUBTITLE_LENGTH = 40;
 
     private ViewPager pager;
     private FilesPagerAdapter adapter;
@@ -46,8 +48,9 @@ public class FilesActivity extends FragmentActivity  {
 
         if (savedInstanceState == null) {
             pager = (ViewPager) findViewById(R.id.pager);
+            pager.setOnPageChangeListener(new PagerListener());
             adapter = new FilesPagerAdapter(getSupportFragmentManager(), new FilesItemClickListener());
-            adapter.setPath("/sdcard");
+            adapter.setPath(DEFAULT_PATH);
             pager.setAdapter(adapter);
             pager.setCurrentItem(adapter.getCount());
 
@@ -85,7 +88,7 @@ public class FilesActivity extends FragmentActivity  {
             drawerListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerListItems);
             drawerList.setAdapter(drawerListAdapter);
             drawerList.setOnItemClickListener(new DrawerItemClickListener());
-            updatePathList();
+            updateDrawer();
         }
     }
 
@@ -98,10 +101,25 @@ public class FilesActivity extends FragmentActivity  {
     }
 
 
-    private void updatePathList() {
+    private void updateDrawer() {
         drawerListItems.clear();
         drawerListItems.addAll(Arrays.asList(adapter.getDirectories()));
         drawerListAdapter.notifyDataSetChanged();
+    }
+
+    private void updateActionBar(String path) {
+        updateActionBar(new File(path));
+    }
+
+    private void updateActionBar(File file) {
+        actionbar.setTitle(file.getName());
+        String possiblyPartialPath = file.getPath();
+
+        if (possiblyPartialPath.length() > 35) {
+            possiblyPartialPath = ".." + possiblyPartialPath.substring(possiblyPartialPath.length() - 33);
+        }
+
+        actionbar.setSubtitle(possiblyPartialPath);
     }
 
     @Override
@@ -148,13 +166,17 @@ public class FilesActivity extends FragmentActivity  {
             super.onBackPressed();
         } else {
             pager.setCurrentItem(pager.getCurrentItem() - 1);
+            updateDrawer();
         }
     }
 
     private class FilesItemClickListener implements FileListFragment.OnItemClickListener {
         @Override
-        public void onClick(int position, View row, File file) {
+        public void onClick(int position, ListView list, View row, File file) {
             Log.d(getClass().getSimpleName(), "Click detected on: " + file.getPath());
+
+            list.clearChoices();
+            list.setItemChecked(position, true);
 
             if ( !file.exists() ) {
                 Toast.makeText(FilesActivity.this, "The file \"" + file.getName() + "\" does not exist", Toast.LENGTH_SHORT).show();
@@ -163,19 +185,18 @@ public class FilesActivity extends FragmentActivity  {
             } else if (file.isDirectory()) {
                 adapter.setPath(file.getPath());
                 pager.setCurrentItem(adapter.getCount());
-                updatePathList();
+                updateDrawer();
 
-                actionbar.setTitle(file.getName());
-                String possiblyPartialPath = file.getPath();
-
-                if (possiblyPartialPath.length() > 40) {
-                    possiblyPartialPath = ".." + possiblyPartialPath.substring(possiblyPartialPath.length() - 38);
-                }
-
-                actionbar.setSubtitle(possiblyPartialPath);
+                //FileListFragment fragment = (FileListFragment) adapter.getItem(pager.getCurrentItem());
+                //fragment.getList().clearChoices();
             } else {
                 openFile(file);
             }
+        }
+
+        @Override
+        public boolean onLongClick(int position, ListView list, View row, File file) {
+            return true;
         }
     }
 
@@ -187,4 +208,32 @@ public class FilesActivity extends FragmentActivity  {
         }
     }
 
+    private class PagerListener extends ViewPager.SimpleOnPageChangeListener {
+        @Override
+        public void onPageSelected(int position) {
+            StringBuilder partialPath;
+
+            if (position == 0) {
+                partialPath = new StringBuilder();
+            } else {
+                partialPath = new StringBuilder("/");
+            }
+
+            String[] folders = adapter.getDirectories();
+
+            for (int i=1; i<position && i<folders.length; i++) {
+                partialPath.append(folders[i]);
+                partialPath.append("/");
+            }
+
+            if (partialPath.length() >= MAX_SUBTITLE_LENGTH) {
+                partialPath.delete(0, partialPath.length() - (MAX_SUBTITLE_LENGTH - 2));
+                partialPath.insert(0, "..");
+            }
+
+            actionbar.setSubtitle(partialPath);
+
+            actionbar.setTitle(folders[position]);
+        }
+    }
 }

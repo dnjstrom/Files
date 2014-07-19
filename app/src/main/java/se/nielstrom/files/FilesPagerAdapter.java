@@ -29,12 +29,15 @@ public class FilesPagerAdapter extends FragmentStatePagerAdapter {
         this.path = path;
         this.directories = path.replaceFirst("^/", "").split("/");
         this.file = new File(path);
+
         notifyDataSetChanged();
     }
 
     public String getPath() {
         return path;
     }
+
+    public File getFile() { return file; }
 
     public String[] getDirectories() {
         String[] dirs = new String[directories.length + 1];
