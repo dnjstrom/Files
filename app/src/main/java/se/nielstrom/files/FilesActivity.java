@@ -18,7 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +38,7 @@ public class FilesActivity extends FragmentActivity  {
     private DrawerLayout drawer;
     private ActionBarDrawerToggle drawerToggle;
     private ActionBar actionbar;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +126,7 @@ public class FilesActivity extends FragmentActivity  {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.files, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -174,9 +175,10 @@ public class FilesActivity extends FragmentActivity  {
         @Override
         public void onClick(int position, ListView list, View row, File file) {
             Log.d(getClass().getSimpleName(), "Click detected on: " + file.getPath());
-
             list.clearChoices();
             list.setItemChecked(position, true);
+            showContextMenuItems(1337, false);
+
 
             if ( !file.exists() ) {
                 Toast.makeText(FilesActivity.this, "The file \"" + file.getName() + "\" does not exist", Toast.LENGTH_SHORT).show();
@@ -196,9 +198,25 @@ public class FilesActivity extends FragmentActivity  {
 
         @Override
         public boolean onLongClick(int position, ListView list, View row, File file) {
+            showContextMenuItems(list.getCheckedItemCount(), true);
             return true;
         }
     }
+
+    private void showContextMenuItems(int nrOfSelected, boolean visible) {
+        if (nrOfSelected <= 0) {
+            return;
+        } else if (nrOfSelected == 1) {
+            menu.findItem(R.id.action_rename).setVisible(visible);
+        } else {
+            menu.findItem(R.id.action_rename).setVisible(false);
+        }
+
+        menu.findItem(R.id.action_copy).setVisible(visible);
+        menu.findItem(R.id.action_cut).setVisible(visible);
+        menu.findItem(R.id.action_share).setVisible(visible);
+    }
+
 
     private class DrawerItemClickListener implements AdapterView.OnItemClickListener {
         @Override

@@ -1,21 +1,17 @@
 package se.nielstrom.files.fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 import se.nielstrom.files.R;
 
@@ -60,7 +56,8 @@ public class FolderAdapter extends ArrayAdapter<File> {
             holder = new ViewHolder();
 
             holder.titleBox = (TextView) convertView.findViewById(R.id.title);
-            holder.right_arrow = (ImageView) convertView.findViewById(R.id.right_arrow);
+            holder.rightArrow = (ImageView) convertView.findViewById(R.id.right_arrow);
+            holder.fileIcon = (ImageView) convertView.findViewById(R.id.file_icon);
 
             convertView.setTag(holder);
         } else {
@@ -70,8 +67,8 @@ public class FolderAdapter extends ArrayAdapter<File> {
         File file = getItem(position);
 
         holder.titleBox.setText(file.getName());
-
-        holder.right_arrow.setVisibility( file.isDirectory() ? View.VISIBLE : View.GONE );
+        holder.rightArrow.setVisibility(file.isDirectory() ? View.VISIBLE : View.GONE);
+        holder.fileIcon.setVisibility(file.isDirectory() ? View.VISIBLE : View.GONE);
 
         if (!file.canRead()) {
             holder.titleBox.setTextColor(getContext().getResources().getColor(R.color.non_writeable));
@@ -84,7 +81,8 @@ public class FolderAdapter extends ArrayAdapter<File> {
 
     static class ViewHolder {
         TextView titleBox;
-        ImageView right_arrow;
+        ImageView rightArrow;
+        ImageView fileIcon;
     }
 
     private class FileNameComparator implements Comparator<File> {

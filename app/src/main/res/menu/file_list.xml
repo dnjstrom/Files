@@ -7,6 +7,50 @@
 
     <item android:id="@+id/action_new_folder"
         android:title="New Folder"
+        android:icon="@drawable/abc_ic_clear_normal"
         android:orderInCategory="1"
-        app:showAsAction="always" />
+        android:visible="false"
+        android:showAsAction="never"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_rename"
+        android:title="Rename"
+        android:icon="@drawable/ic_action_edit"
+        android:orderInCategory="1"
+        android:visible="false"
+        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_copy"
+        android:title="Copy"
+        android:icon="@drawable/ic_action_copy"
+        android:orderInCategory="1"
+        android:visible="false"
+        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_cut"
+        android:title="Cut"
+        android:icon="@drawable/ic_action_cut"
+        android:orderInCategory="1"
+        android:visible="false"
+        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_paste"
+        android:title="Paste"
+        android:icon="@drawable/ic_action_paste"
+        android:orderInCategory="1"
+        android:visible="false"
+        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_share"
+        android:title="Share"
+        android:icon="@drawable/ic_action_share"
+        android:orderInCategory="1"
+        android:visible="false"
+        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom" />
+
 </menu>
